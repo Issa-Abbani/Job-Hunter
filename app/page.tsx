@@ -8,7 +8,7 @@ export default function Home() {
     <div className="flex min-h-screen flex-col bg-white">
       <main>
         {/*Hero Section*/}
-        <section className="container mx-auto px-4 py-32">
+        <section className="container mx-auto px-4 py-32 h-[90vh]">
           <div className="mx-auto max-w-4xl text-center">
             <h1 className="text-black mb-6 text-6xl font-bold">
               A better way to track your job applications.
