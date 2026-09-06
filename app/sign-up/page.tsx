@@ -9,10 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { signUp } from "@/lib/auth/auth-client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function SignUp() {
   const [name, setName] = useState<string>("");
@@ -22,13 +24,27 @@ export default function SignUp() {
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const router = useRouter()
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault(); //There are other ways in next.js
 
     setError("");
     setLoading(true);
 
     try {
+      const result = await signUp.email({
+        name,
+        email,
+        password
+      })
+
+      if(result.error){
+        setError(result.error.message ?? "Failed to Sign Up");
+      }else{
+        router.push("/dashboard");
+      }
+
     } catch (err) {
       setError("An unexpected error occured" + err);
     } finally {
