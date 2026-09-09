@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
+import CreateJobAppDialogue from "./create-job-dialogue";
 
 interface KanbanBoardProps {
   board: Board;
@@ -73,18 +74,22 @@ function DroppableColumn({
               {column.name}
             </CardTitle>
           </div>
+
           <DropdownMenu>
-            <DropdownMenuTrigger>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-6 w-6 text-white hover:bg-white/20"
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-white hover:bg-white/20"
+                />
+              }
+            >
+              <MoreVertical className="h-4 w-4" />
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="text-destructive">
+              <DropdownMenuItem variant="destructive">
                 <Trash2 className="mr-2 h-4 w-4" />
                 Delete Column
               </DropdownMenuItem>
@@ -93,10 +98,10 @@ function DroppableColumn({
         </div>
       </CardHeader>
 
-      <CardContent className={`space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg`}>
-
-
-        
+      <CardContent
+        className={`space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg`}
+      >
+        <CreateJobAppDialogue columnId={column._id} boardId={boardId} />
       </CardContent>
     </Card>
   );
