@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
 import connectDB from "@/lib/db";
 import { Board } from "@/lib/models";
+import KanbanBoard from "@/components/kanban-board";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -16,9 +17,11 @@ export default async function Dashboard() {
   const board = await Board.findOne({
     userId: session.user.id,
     name: "Job Hunt",
+  }).populate({
+    path: "columns"
   });
 
-  console.log(board);
+const plainBoard = JSON.parse(JSON.stringify(board));
 
   return (
     <div className="min-h-screen bg-white">
@@ -27,7 +30,7 @@ export default async function Dashboard() {
           <h1 className="text-3xl font-bold text-black">Job Hunt</h1>
           <p className="text-gray-600">Track your job applications</p>
         </div>
-        {/* <KanbanBoard board={board} userId={session.user.id} /> */}
+        <KanbanBoard board={plainBoard} userId={session.user.id} />
       </div>
     </div>
   );
