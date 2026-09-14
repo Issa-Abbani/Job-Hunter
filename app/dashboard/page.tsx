@@ -4,29 +4,41 @@ import { redirect } from "next/navigation";
 import connectDB from "@/lib/db";
 import { Board } from "@/lib/models";
 import KanbanBoard from "@/components/kanban-board";
+import { Suspense } from "react";
 
-export default async function Dashboard() {
-  const session = await getSession();
+//We only cached here because a component utilizing headers (through useSession()). There are workarounds
+async function getBoard(userId: string) {
+  "use cache";
+
+  await connectDB();
+
+  const boardDoc = await Board.findOne({
+    userId: userId,
+    name: "Job Hunt",
+  }).populate({
+    path: "columns",
+    populate: {
+      path: "jobApplications",
+    },
+  });
+  //Basically a triple join
+
+  if (!boardDoc) return null;
+
+  const board = JSON.parse(JSON.stringify(boardDoc));
+
+  return board;
+}
+
+async function DashboardPage() {
+  const session = await getSession() || null;
+
 
   if (!session?.user) {
     redirect("/sign-in");
   }
 
-  await connectDB();
-
-  const board = await Board.findOne({
-    userId: session.user.id,
-    name: "Job Hunt",
-  }).populate({
-    path: "columns",
-    populate: {
-      path: "jobApplications"
-    }
-  });
-
-  //Basically a triple join
-
-const plainBoard = JSON.parse(JSON.stringify(board));
+  const board = await getBoard(session.user.id);
 
   return (
     <div className="min-h-screen bg-white">
@@ -35,8 +47,16 @@ const plainBoard = JSON.parse(JSON.stringify(board));
           <h1 className="text-3xl font-bold text-black">Job Hunt</h1>
           <p className="text-gray-600">Track your job applications</p>
         </div>
-        <KanbanBoard board={plainBoard} userId={session.user.id} />
+        <KanbanBoard board={board} userId={session.user.id} />
       </div>
     </div>
+  );
+}
+
+export default async function Dashboard() {
+  return (
+    <Suspense fallback={<p className="text-6xl mx-auto my-auto">Loading...</p>}>
+      <DashboardPage />
+    </Suspense>
   );
 }

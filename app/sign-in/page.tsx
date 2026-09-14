@@ -40,6 +40,8 @@ export default function SignIn() {
       if (result.error) {
         setError(result.error.message ?? "Failed to Sign Up");
       } else {
+        setEmail("");
+        setPassword("");
         router.push("/dashboard");
       }
     } catch (err) {
