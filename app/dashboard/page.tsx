@@ -18,8 +18,13 @@ export default async function Dashboard() {
     userId: session.user.id,
     name: "Job Hunt",
   }).populate({
-    path: "columns"
+    path: "columns",
+    populate: {
+      path: "jobApplications"
+    }
   });
+
+  //Basically a triple join
 
 const plainBoard = JSON.parse(JSON.stringify(board));
 

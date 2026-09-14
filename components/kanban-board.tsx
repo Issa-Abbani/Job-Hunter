@@ -1,11 +1,10 @@
 "use client";
-import type { Board, Column } from "@/lib/models/models.types";
+import type { Board, Column, JobApplication } from "@/lib/models/models.types";
 import {
   Award,
   Calendar,
   CheckCircle2,
   Mic,
-  MoreHorizontal,
   MoreVertical,
   Trash2,
   XCircle,
@@ -19,6 +18,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import CreateJobAppDialogue from "./create-job-dialogue";
+import JobApplicationCard from "./job-application-card";
 
 interface KanbanBoardProps {
   board: Board;
@@ -57,11 +57,15 @@ function DroppableColumn({
   column,
   config,
   boardId,
+  sortedColumns,
 }: {
   column: Column;
   config: ColConfig;
   boardId: string;
+  sortedColumns: Column[]
 }) {
+  const sortedJobs =
+    column.jobApplications.sort((a, b) => a.order - b.order) || [];
   return (
     <Card className="min-w-75 shrink-0 shadow-md p-0">
       <CardHeader
@@ -101,21 +105,34 @@ function DroppableColumn({
       <CardContent
         className={`space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg`}
       >
+        {sortedJobs.map((job, key)=>(
+          <SortableJobCard key={key} job={{...job, columnId: job.columnId || column._id}} columns={sortedColumns}/>
+        ))}
         <CreateJobAppDialogue columnId={column._id} boardId={boardId} />
       </CardContent>
     </Card>
   );
 }
 
+function SortableJobCard({job, columns}: {job: JobApplication, columns:Column[]}){
+  return(
+    <div>
+      <JobApplicationCard  job={job} columns={columns}/>
+    </div>
+  )
+}
+
 export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
   //Note that the borad.columns is justt the board ids. You also need to tell mongoose or mongo or whatever u use that you wanna fetch the data (Think foreing key stuff and JOINS for SQL)
   const columns = board.columns;
 
+    const sortedColumns = columns?.sort((a, b) => a.order - b.order) || [];
+
   return (
     <>
-      <div>
-        <div>
-          {columns.map((col, key) => {
+      <div className="space-y-4">
+        <div className="flex gap-4 overflow-x-auto pb-4">
+          {sortedColumns.map((col, key) => {
             const config = COLUMN_CONFIG[key] || {
               color: "bg-gray-500",
               icon: <Calendar className="h-4 w-4" />,
@@ -126,6 +143,7 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
                 column={col}
                 config={config}
                 boardId={board._id}
+                sortedColumns={sortedColumns}
               />
             );
           })}

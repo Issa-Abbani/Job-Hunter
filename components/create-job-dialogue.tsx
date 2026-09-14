@@ -54,6 +54,7 @@ export default function CreateJobAppDialogue({
       });
       if(!result.error){
         setFormData(INITIAL_FORM_DATA);
+        setOpen(false);
       }else{
         console.error("Failed to create job: ",result.error);
       }
